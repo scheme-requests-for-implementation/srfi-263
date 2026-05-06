@@ -1,9 +1,7 @@
 (import (scheme base)
         (scheme case-lambda)
         (scheme cxr)
-        (scheme write)
-        (srfi 1)
-        (trace))
+        (srfi 1))
 
 ;;; Core system
 
@@ -89,7 +87,7 @@
             (lambda (self)
               (cond ((or
                       (assq name message-alist)
-                      (assq name (get-message-alist ((self 'mirror) '--obj-data))))
+                      (assq name (get-message-alist ((self 'mirror) '##srfi-263#obj-data))))
                      => cdr)
                     (else #f)))))
     mfinder))
@@ -100,7 +98,7 @@
     => (lambda (alist-entry)
          (values alist-entry #t)))
    (else
-    (let ((obj-data ((self 'mirror) '--obj-data)))
+    (let ((obj-data ((self 'mirror) '##srfi-263#obj-data)))
       (let loop ((parents (get-parent-list obj-data))
                  (handler-count 0)
                  (handler #f)
@@ -121,7 +119,7 @@
               (values 'message-not-understood #f)))))))))
 
 (define (recursive-ancestor-collector self)
-  (let ((parents (get-parent-list ((self 'mirror) '--obj-data))))
+  (let ((parents (get-parent-list ((self 'mirror) '##srfi-263#obj-data))))
     (if (null? parents)
         (list self)
         (apply lset-union
@@ -136,7 +134,7 @@
              (eq? (car a) (car b)))
            (list)
            (map (lambda (class)
-                  (get-slot-list ((class 'mirror) '--obj-data)))
+                  (get-slot-list ((class 'mirror) '##srfi-263#obj-data)))
                 parents))))
 
 ;;;; Method running
@@ -202,7 +200,7 @@
   (map
    (lambda (name proc)
      (set-method-slot! mirror-data name proc))
-   '(--obj-data immediate-message-alist
+   '(##srfi-263#obj-data immediate-message-alist
                 immediate-ancestor-list full-ancestor-list
                 immediate-slot-list full-slot-list)
    (list (lambda (self resend) obj-data)
@@ -220,7 +218,7 @@
      obj-data
      (alist-cons 'set-method-slot!
                  (lambda (self resend name . args)
-                   (apply set-method-slot! ((self 'mirror) '--obj-data)
+                   (apply set-method-slot! ((self 'mirror) '##srfi-263#obj-data)
                           name args))
                  (get-message-alist obj-data)))
     (set-slot-list!
@@ -247,15 +245,15 @@
     (set-method-slot!
      obj-data 'delete-slot!
      (lambda (self resend name)
-       (delete-slot! ((self 'mirror) '--obj-data) name)))
+       (delete-slot! ((self 'mirror) '##srfi-263#obj-data) name)))
     (set-method-slot!
      obj-data 'set-value-slot!
      (lambda (self resend name . args)
-       (apply set-slot! ((self 'mirror) '--obj-data) 'value name args)))
+       (apply set-slot! ((self 'mirror) '##srfi-263#obj-data) 'value name args)))
     (set-method-slot!
      obj-data 'set-parent-slot!
      (lambda (self resend name . args)
-       (apply set-slot! ((self 'mirror) '--obj-data) 'parent name args)))
+       (apply set-slot! ((self 'mirror) '##srfi-263#obj-data) 'parent name args)))
     (set-method-slot!
      obj-data 'message-not-understood
      (lambda (self resend message args)
